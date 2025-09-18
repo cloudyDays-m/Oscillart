@@ -18,6 +18,7 @@ var height = ctx.canvas.height;
 var amplitude = 40;
 var interval = null
 var x,y;
+var reset = false;
 
 notenames = new Map();
 notenames.set("C", 261.6);
@@ -41,7 +42,7 @@ gainNode.gain.value = 0;
 function frequency(pitch) {
     gainNode.gain.setValueAtTime(1, audioCtx.currentTime);           
     oscillator.frequency.setValueAtTime(pitch, audioCtx.currentTime); 
-    gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 1);       
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.9);       
 }
 
 function handle() {
@@ -52,6 +53,8 @@ function handle() {
     for (i = 0; i < usernotes.length; i++) {
     noteslist.push(notenames.get(usernotes.charAt(i)));
     }
+
+    reset = true;
 
     let j = 0;
     repeat = setInterval(() => {
@@ -73,15 +76,20 @@ function drawWave(pitch) {
     }
 
     counter = 0;
-    ctx.clearRect(0, 0, width, height);
+   if (reset) {
+    ctx.clearRect(0 , 0, width , height);
     x = 0;
     y = height/2;
-
     ctx.moveTo(x,y);
-    ctx.beginPath(); 
+    ctx.beginPath();
+     reset = false;
+
+   }
+
     interval = setInterval(function() {
         line(pitch);
     }, 20);
+
 }
 
 function line(pitch) {
@@ -92,7 +100,7 @@ function line(pitch) {
     x++;
     counter++;
 
-    if (counter > 100) { 
+    if (counter > 50) { 
         clearInterval(interval);
     }
 }
