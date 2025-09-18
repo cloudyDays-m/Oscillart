@@ -1,4 +1,6 @@
 const input = document.getElementById('input');
+const color_picker = document.getElementById('color');
+const vol_slider = document.getElementById('vol-slider');
 
 // create web audio api elements 
 const audioCtx = new AudioContext();
@@ -19,7 +21,9 @@ var amplitude = 40;
 var interval = null
 var x,y;
 var reset = false;
-
+var timepernote = 0; // how long the time should be to play each note
+var length = 0 // length of notes list
+ 
 notenames = new Map();
 notenames.set("C", 261.6);
 notenames.set("D", 293.7);
@@ -40,9 +44,10 @@ oscillator.start()
 gainNode.gain.value = 0;
 
 function frequency(pitch) {
-    gainNode.gain.setValueAtTime(1, audioCtx.currentTime);           
+    gainNode.gain.setValueAtTime(vol_slider.value, audioCtx.currentTime);    
+    setting = setInterval(() => {gainNode.gain.value = vol_slider.value}, 1);
     oscillator.frequency.setValueAtTime(pitch, audioCtx.currentTime); 
-    gainNode.gain.setValueAtTime(0, audioCtx.currentTime + 0.9);       
+    setTimeout(() => {clearInterval(setting); gainNode.gain.value = 0;}, ((timepernote) - 10))       
 }
 
 function handle() {
@@ -50,6 +55,10 @@ function handle() {
 
     var usernotes = String(input.value);
     var noteslist = [];
+
+    length = usernotes.length;
+    timepernote = (6000/length);
+
     for (i = 0; i < usernotes.length; i++) {
     noteslist.push(notenames.get(usernotes.charAt(i)));
     }
@@ -65,7 +74,7 @@ function handle() {
         } else {
             clearInterval(repeat)
         }
-    }, 1000)
+    }, timepernote)
 }
 
 var counter = 0;
@@ -94,13 +103,15 @@ function drawWave(pitch) {
 
 function line(pitch) {
     var freq = pitch / 10000;  
-    y = height/2 + (amplitude * Math.sin(x * 2 * Math.PI * freq));
+    y = height/2 + ( ((vol_slider.value/100)*40) * Math.sin(x * 2 * Math.PI * freq * (0.5 * length))); // calculates length for longer waves for more notes and shorter waves for smaller number of notes
     ctx.lineTo(x, y);
-    ctx.stroke();
     x++;
     counter++;
+    ctx.strokeStyle = color_picker.value;
 
-    if (counter > 50) { 
+    if (counter > Math.floor(timepernote/20)) { 
         clearInterval(interval);
     }
+
+    ctx.stroke();
 }
