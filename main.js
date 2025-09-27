@@ -1,6 +1,7 @@
 const input = document.getElementById('input');
 const color_picker = document.getElementById('color');
 const vol_slider = document.getElementById('vol-slider');
+const fill_checkbox = document.getElementById('fill-checkbox')
 
 // create web audio api elements 
 const audioCtx = new AudioContext();
@@ -25,6 +26,7 @@ var timepernote = 0; // how long the time should be to play each note
 var length = 0 // length of notes list
 var blob, recorder = null;
 var chunks = []
+var setting = null;
  
 notenames = new Map();
 notenames.set("C", 261.6);
@@ -46,8 +48,8 @@ oscillator.start()
 gainNode.gain.value = 0;
 
 function frequency(pitch) {
-    gainNode.gain.setValueAtTime(vol_slider.value, audioCtx.currentTime);    
-    setting = setInterval(() => {gainNode.gain.value = vol_slider.value}, 1);
+    gainNode.gain.setValueAtTime(vol_slider.value/100, audioCtx.currentTime);    
+    setting = setInterval(() => {gainNode.gain.value = vol_slider.value/100}, 1);
     oscillator.frequency.setValueAtTime(pitch, audioCtx.currentTime); 
     setTimeout(() => {clearInterval(setting); gainNode.gain.value = 0;}, ((timepernote) - 10))       
 }
@@ -66,9 +68,8 @@ function handle() {
     noteslist.push(notenames.get(usernotes.charAt(i)));
     }
 
-
     let j = 0;
-    repeat = setInterval(() => {
+    var repeat = setInterval(() => {
         if (j < noteslist.length) {
             frequency(parseInt(noteslist[j]));
             drawWave(noteslist[j]); 
@@ -114,25 +115,37 @@ function line(pitch) {
 
     if (counter > Math.floor(timepernote/20)) { 
         clearInterval(interval);
+
+        if (fill_checkbox.checked) {
+            ctx.lineTo(x, height);
+            ctx.lineTo(0, height);
+            ctx.lineTo(0, height/2);
+            ctx.closePath();
+
+            ctx.fillStyle = color_picker.value + '40';
+            ctx.fill();
+        }
     }
 
     ctx.stroke();
+
+    if (rotate_checkbox.checked) {
+        ctx.restore(); // restores canvas to original
+    }
 }
 
-// Add in video data
-
-canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
-audioDestination.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
-
-
 function startRecording() {
+    chunks = [];
     const canvasStream = canvas.captureStream(20); // captures canvas every 20 frames
     const audioDestination = audioCtx.createMediaStreamDestination();
     gainNode.connect(audioDestination); 
-    const combinedStream = new MediaStream(); 
-    canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track)); 
-    audioDestination.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track))
+    const combinedStream = new MediaStream();
+
+    canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
+    audioDestination.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+    
     recorder = new MediaRecorder(combinedStream, {mimeType: 'video/webm'}); 
+ 
     
     recorder.ondataavailable = e => {
         if (e.data.size > 0) {
@@ -156,7 +169,7 @@ function startRecording() {
 
 var is_recording = false; 
 
-const recording_toggle = docugetElementById('record');
+const recording_toggle = document.getElementById('record');
 
 function toggle() {
     is_recording = !is_recording;
@@ -166,7 +179,9 @@ function toggle() {
 
     } else {
         recording_toggle.innerHTML = "Start Recording";
-        recorder.stop();
+        if (recorder && recorder.state === 'recording') {
+             recorder.stop();
+        } 
     }
 
 }
