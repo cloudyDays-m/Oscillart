@@ -23,6 +23,8 @@ var x,y;
 var reset = false;
 var timepernote = 0; // how long the time should be to play each note
 var length = 0 // length of notes list
+var blob, recorder = null;
+var chunks = []
  
 notenames = new Map();
 notenames.set("C", 261.6);
@@ -51,6 +53,7 @@ function frequency(pitch) {
 }
 
 function handle() {
+    reset = true;
     audioCtx.resume();
 
     var usernotes = String(input.value);
@@ -63,7 +66,6 @@ function handle() {
     noteslist.push(notenames.get(usernotes.charAt(i)));
     }
 
-    reset = true;
 
     let j = 0;
     repeat = setInterval(() => {
@@ -73,6 +75,7 @@ function handle() {
         j++
         } else {
             clearInterval(repeat)
+            oscillator.stop(); 
         }
     }, timepernote)
 }
@@ -114,4 +117,56 @@ function line(pitch) {
     }
 
     ctx.stroke();
+}
+
+// Add in video data
+
+canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
+audioDestination.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+
+
+function startRecording() {
+    const canvasStream = canvas.captureStream(20); // captures canvas every 20 frames
+    const audioDestination = audioCtx.createMediaStreamDestination();
+    gainNode.connect(audioDestination); 
+    const combinedStream = new MediaStream(); 
+    canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track)); 
+    audioDestination.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track))
+    recorder = new MediaRecorder(combinedStream, {mimeType: 'video/webm'}); 
+    
+    recorder.ondataavailable = e => {
+        if (e.data.size > 0) {
+        chunks.push(e.data);
+        }
+    }
+
+    recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'recording.webm';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    recorder.start();
+
+}
+
+var is_recording = false; 
+
+const recording_toggle = docugetElementById('record');
+
+function toggle() {
+    is_recording = !is_recording;
+    if (is_recording){
+        recording_toggle.innerHTML = "Stop Recording";
+        startRecording();
+
+    } else {
+        recording_toggle.innerHTML = "Start Recording";
+        recorder.stop();
+    }
+
 }
