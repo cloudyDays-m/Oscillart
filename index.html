@@ -1,35 +1,60 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta na
-    me="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="style.css" rel="stylesheet"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="style.css" rel="stylesheet" />
     <title>my site</title>
 </head>
 <body>
-
     <div id="container">
-        <input type="text" id="input">
-        <button id="submit" onclick="handle()"> press here </button>
-        <input type="color" id="color" value="ff0000"> 
-        <input type="range" min="1" max="100" value="100" id="vol-slider">
-        <button id="record" onclick="toggle()"> start recording </button>
 
-        <label>Fill Color:</label>
-        <select id="fill-color-select">
-            <option value="#ff0040">pink</option>
-            <option value="#00ff80">green</option>
-            <option value="#4080ff">blue</option>
-            <option value="#ff8000">orange</option>
-            <option value="#8000ff">purple</option>
-            <option value="#ffff00">yellow</option>
+        <div class="controls">
+            <input type="text" id="input" placeholder="enter the notes you want to show on the wave" />
+            <button id="submit">play</button>
+        </div>
 
+        <div class="controls">
+            <label>wave colors:</label>
+            <select id="wave-color-select">
+                <option value="#ff0000">red</option>
+                <option value="#00ff00">green</option>
+                <option value="#0000ff">blue</option>
+                <option value="#ff8000">orange</option>
+                <option value="#8000ff">purple</option>
+                <option value="custom">custom</option>
+            </select>
 
-        <canvas id="canvas">
-            
-        </canvas>
+            <input type="color" id="color" value="#ff0000" />
+
+            <label>volume:</label>
+            <input type="range" min="1" max="100" value="100" id="vol-slider" />
+            <label>line thickness:</label>
+            <input type="range" min="1" max="10" value="2" id="thickness-slider" />
+            <span id="thickness-value">2</span>px
+        </div>
+
+        <div class="controls">
+            <input type="checkbox" id="fill-checkbox" />
+            <label>fill waves</label>
+
+            <label>fill color:</label>
+            <select id="fill-color-select">
+                <option value="#ff0040">pink</option>
+                <option value="#00ff80">green</option>
+                <option value="#4080ff">blue</option>
+                <option value="#ff8000">orange</option>
+                <option value="#8000ff">purple</option>
+                <option value="#ffff00">yellow</option>
+            </select>
+        </div>
+
+        <div class="controls">
+            <button id="record">start recording</button>
+        </div>
+
+        <canvas id="canvas" width="600" height="200"></canvas>
     </div>
+
     <script src="main.js"></script>
 </body>
 </html>

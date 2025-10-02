@@ -2,6 +2,11 @@ const input = document.getElementById('input');
 const color_picker = document.getElementById('color');
 const vol_slider = document.getElementById('vol-slider');
 const fill_checkbox = document.getElementById('fill-checkbox')
+const fill_color_select = document.getElementById('fill-color-select')
+const wave_color_select = document.getElementById('wave-color-select')
+const thickness_slider = document.getElementById('thickness-slider')
+const thickness_value = document.getElementById('thickness-value')
+const submit_btn = document.getElementById('submit')
 
 // create web audio api elements 
 const audioCtx = new AudioContext();
@@ -47,12 +52,27 @@ notenames.set("b", 493.9);
 oscillator.start()
 gainNode.gain.value = 0;
 
-function frequency(pitch) {
-    gainNode.gain.setValueAtTime(vol_slider.value/100, audioCtx.currentTime);    
-    setting = setInterval(() => {gainNode.gain.value = vol_slider.value/100}, 1);
-    oscillator.frequency.setValueAtTime(pitch, audioCtx.currentTime); 
-    setTimeout(() => {clearInterval(setting); gainNode.gain.value = 0;}, ((timepernote) - 10))       
+function getWaveColor() {
+    if (wave_color_select && wave_color_select.value === 'custom') {
+        return color_picker.value;
+    }
+    return wave_color_select ? wave_color_select.value : color_picker.value;
 }
+
+function frequency(pitch) {
+    const osc = audioCtx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
+
+    const noteGain = audioCtx.createGain();
+    noteGain.gain.setValueAtTime(vol_slider.value / 100, audioCtx.currentTime);
+    osc.connect(noteGain);
+    noteGain.connect(audioCtx.destination); 
+    
+    osc.start();
+    noteGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + (timepernote / 1000));
+    osc.stop(audioCtx.currentTime + (timepernote / 1000));
+};
 
 function handle() {
     reset = true;
@@ -71,15 +91,17 @@ function handle() {
     let j = 0;
     var repeat = setInterval(() => {
         if (j < noteslist.length) {
-            frequency(parseInt(noteslist[j]));
-            drawWave(noteslist[j]); 
-        j++
+        const pitch = noteslist[j] || 0;
+        frequency(parseInt(pitch));
+        drawWave(pitch);
+        j++;
+        
         } else {
-            clearInterval(repeat)
-            oscillator.stop(); 
-        }
-    }, timepernote)
-}
+        clearInterval(repeat);
+        oscillator.stop(); 
+                }
+        }, timepernote);
+            }
 
 var counter = 0;
 
@@ -99,6 +121,8 @@ function drawWave(pitch) {
 
    }
 
+   ctx.lineWidth = parseInt(thickness_slider.value);
+
     interval = setInterval(function() {
         line(pitch);
     }, 20);
@@ -111,7 +135,8 @@ function line(pitch) {
     ctx.lineTo(x, y);
     x++;
     counter++;
-    ctx.strokeStyle = color_picker.value;
+
+    ctx.strokeStyle = getWaveColor();
 
     if (counter > Math.floor(timepernote/20)) { 
         clearInterval(interval);
@@ -122,7 +147,7 @@ function line(pitch) {
             ctx.lineTo(0, height/2);
             ctx.closePath();
 
-            ctx.fillStyle = color_picker.value + '40';
+            ctx.fillStyle = fill_color_select.value + '60';
             ctx.fill();
         }
     }
@@ -185,3 +210,33 @@ function toggle() {
     }
 
 }
+
+if (submit_btn) submit_btn.addEventListener('click', handle);
+
+// the wave recording button
+
+if (recording_toggle) recording_toggle.addEventListener('click', toggle);
+
+//changes the thickness and line width when the user slides the slider
+
+thickness_slider.addEventListener('input', () => {
+    thickness_value.textContent = thickness_slider.value;
+    ctx.lineWidth = parseInt(thickness_slider.value);
+})
+
+wave_color_select.addEventListener('change', () => {
+    if (wave_color_select.value === 'custom') {
+        color_picker.disabled = false;
+
+    } else {
+        color_picker.disabled = true;
+    }
+});
+
+(function initUI() {
+    // Set initial line width
+    ctx.lineWidth = parseInt(thickness_slider.value);
+    thickness_value.textContent = thickness_slider.value;
+    // If preset is not custom, disable color picker
+    color_picker.disabled = (wave_color_select.value !== 'custom');
+})();
