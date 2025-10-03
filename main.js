@@ -234,9 +234,9 @@ wave_color_select.addEventListener('change', () => {
 });
 
 (function initUI() {
-    // Set initial line width
+    // sets the inital wave width
     ctx.lineWidth = parseInt(thickness_slider.value);
     thickness_value.textContent = thickness_slider.value;
-    // If preset is not custom, disable color picker
+    // f preset is not custom, disables color picker
     color_picker.disabled = (wave_color_select.value !== 'custom');
 })();
