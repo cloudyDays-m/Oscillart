@@ -133,7 +133,7 @@ function line(pitch) {
     var freq = pitch / 10000;  
     y = height/2 + ( ((vol_slider.value/100)*40) * Math.sin(x * 2 * Math.PI * freq * (0.5 * length))); // calculates length for longer waves for more notes and shorter waves for smaller number of notes
     ctx.lineTo(x, y);
-    x++;
+    x+= 1.5; // increased in order to stretch the waves horizontally so that they look less compressed on the canvas
     counter++;
 
     ctx.strokeStyle = getWaveColor();
