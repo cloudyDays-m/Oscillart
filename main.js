@@ -230,13 +230,22 @@ wave_color_select.addEventListener('change', () => {
 
     } else {
         color_picker.disabled = true;
+        color_picker.value = wave_color_select.value;
     }
 });
 
 (function initUI() {
-    // sets the inital wave width
-    ctx.lineWidth = parseInt(thickness_slider.value);
-    thickness_value.textContent = thickness_slider.value;
-    // f preset is not custom, disables color picker
-    color_picker.disabled = (wave_color_select.value !== 'custom');
+    ctx.lineWidth = parseInt(thickness_slider.value); 
+    thickness_value.textContent = thickness_slider.value; 
+    
+    if (wave_color_select.value !== 'custom') {
+
+        color_picker.disabled = true;
+        color_picker.value = wave_color_select.value; 
+    } else {
+        color_picker.disabled = false;
+
+    }
+
 })();
+

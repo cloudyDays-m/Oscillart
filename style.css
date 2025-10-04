@@ -20,9 +20,8 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(225,225,225,0.85);
-    backdrop-filter: blur(3px);
-    z-index: 0;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .bg-full {
@@ -33,7 +32,7 @@ body::before {
     object-position: center center;
     background-size: cover;
     background-attachment: fixed;
-    z-index: -1;
+    z-index: 0;
     top: 0;
     left: 0;
 }
@@ -41,7 +40,7 @@ body::before {
 
 #container { 
     position: relative;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     flex-direction:column;
     align-items: center;
