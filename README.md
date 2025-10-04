@@ -4,3 +4,9 @@ This is a small web project I made with the assistance of https://oscillart.athe
 
 This website creates a AudioContext node and through making a few core nodes, OscillatorNode, GainNode etc was able to generate and control the sound. Since this was my first time working with audio, it took a lot of trial and error to get things working just as I wanted, and the resource provided by Athena Awards proved to be an incredible gateway to learn exactly how everything worked. 
 
+playable link: https://cloudydays-m.github.io/Oscillart/ 
+
+<img width="1920" height="900" alt="image" src="https://github.com/user-attachments/assets/cf6bee78-429b-443a-96f1-fb739ed4c26f" />
+
+
+[![Athena Award Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Faward.athena.hackclub.com%2Fapi%2Fbadge)](https://award.athena.hackclub.com?utm_source=readme)
